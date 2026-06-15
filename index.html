@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Walkthrough — Demo</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍫</text></svg>" />
+    <link rel="stylesheet" href="/src/demo/demo.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand"><span class="logo">🍫</span> Cocoa<strong>Works</strong></div>
+      <nav class="topnav">
+        <a href="#" class="active">Dashboard</a>
+        <a href="#">Team</a>
+        <a href="#">Docs</a>
+      </nav>
+      <button id="account-btn" class="icon-btn" aria-label="Account">👤</button>
+    </header>
+
+    <main class="layout">
+      <h1 class="page-title">Production Dashboard</h1>
+      <p class="page-sub">Everything you need to run the candy line, in one place.</p>
+
+      <div class="tabs" role="tablist">
+        <button class="tab active" data-tab="overview" role="tab">Overview</button>
+        <button class="tab" data-tab="production" role="tab">Production</button>
+        <button class="tab" data-tab="inventory" role="tab">Inventory</button>
+        <button class="tab" data-tab="reports" role="tab">Reports</button>
+      </div>
+
+      <!-- Overview -->
+      <section class="panel active" data-panel="overview">
+        <div class="cards">
+          <div class="card"><span class="stat">12,480</span><span class="label">Bars made today</span></div>
+          <div class="card"><span class="stat">98.2%</span><span class="label">Quality pass rate</span></div>
+          <div class="card"><span class="stat">3</span><span class="label">Lines running</span></div>
+        </div>
+        <div class="row">
+          <button id="new-batch" class="btn btn-primary">+ New Batch</button>
+          <button id="refresh" class="btn">Refresh data</button>
+        </div>
+      </section>
+
+      <!-- Production -->
+      <section class="panel" data-panel="production" hidden>
+        <p class="panel-intro">Control the live production lines.</p>
+        <div class="row">
+          <button id="start-line" class="btn btn-success">▶ Start Line</button>
+          <button id="pause-line" class="btn btn-warning">❚❚ Pause Line</button>
+          <button id="recipe" class="btn">Edit Recipe</button>
+        </div>
+        <div class="line-status">Line 1 — <strong>Running</strong> · Milk Chocolate · 320 bars/min</div>
+      </section>
+
+      <!-- Inventory -->
+      <section class="panel" data-panel="inventory" hidden>
+        <p class="panel-intro">Track cocoa, sugar, and packaging stock.</p>
+        <div class="row">
+          <button id="add-stock" class="btn btn-primary">+ Add Stock</button>
+          <button id="order-supplies" class="btn">Order Supplies</button>
+        </div>
+        <ul class="inv-list">
+          <li><span>Cocoa beans</span><span class="ok">Healthy</span></li>
+          <li><span>Sugar</span><span class="warn">Low</span></li>
+          <li><span>Foil wrap</span><span class="ok">Healthy</span></li>
+        </ul>
+      </section>
+
+      <!-- Reports -->
+      <section class="panel" data-panel="reports" hidden>
+        <p class="panel-intro">Generate and export production reports.</p>
+        <div class="row">
+          <button id="generate-report" class="btn btn-primary">Generate Report</button>
+          <button id="export-csv" class="btn">Export CSV</button>
+          <button id="schedule" class="btn">Schedule Email</button>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="/src/demo/main.ts"></script>
+  </body>
+</html>
