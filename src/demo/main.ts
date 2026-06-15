@@ -1,94 +1,106 @@
 import { Walkthrough } from "../walkthrough/index.ts";
 
-// --- demo page behavior: simple tab switching -------------------------
-const tabs = document.querySelectorAll<HTMLButtonElement>(".tab");
-const panels = document.querySelectorAll<HTMLElement>(".panel");
-
-function activateTab(name: string) {
-  tabs.forEach((t) => t.classList.toggle("active", t.dataset.tab === name));
-  panels.forEach((p) => {
-    const match = p.dataset.panel === name;
-    p.classList.toggle("active", match);
-    p.hidden = !match;
+// --- portal behavior: expandable sidebar groups -----------------------
+document.querySelectorAll<HTMLButtonElement>(".nav-group").forEach((group) => {
+  group.addEventListener("click", () => {
+    const name = group.dataset.group!;
+    const sub = document.querySelector<HTMLElement>(`.nav-sub[data-sub="${name}"]`);
+    const open = group.classList.toggle("open");
+    sub?.classList.toggle("open", open);
   });
-}
-tabs.forEach((tab) =>
-  tab.addEventListener("click", () => activateTab(tab.dataset.tab!)),
-);
+});
 
 // --- the guided tour --------------------------------------------------
 const tour = new Walkthrough({
   characterName: "Pip",
-  accentColor: "#6c5ce7",
+  accentColor: "#33a7e0", // EnSight blue
   speech: true,
-  storageKey: "cocoaworks-tour",
+  storageKey: "ensight-tour",
   steps: [
     {
-      // intro — no target, character "to camera"
       title: "Hi, I'm Pip! 👋",
-      text: "Welcome to CocoaWorks! I'll give you a quick tour of your production dashboard and show you what every part does. Ready? Let's go!",
+      text: "Welcome to the EnSight portal! In about a minute I'll show you around your admin dashboard and point out what everything does. Let's dive in.",
     },
     {
-      target: ".tabs",
-      title: "Your main tabs",
-      text: "These four tabs organize everything: Overview, Production, Inventory, and Reports. Click any one to switch sections — I'll walk you through each.",
+      target: "#nav-dashboard",
+      title: "Main navigation",
+      text: "This sidebar is how you move around the portal — Dashboard, Signage, reports, user management, alerts, and admin tools all live here.",
+      side: "right",
+      padding: 4,
+    },
+    {
+      target: "#site-picker",
+      title: "Pick your site",
+      text: "Up here you choose which garage you're viewing. Right now we're looking at 2075 Broadway — switch sites any time from this menu.",
       side: "bottom",
     },
     {
-      openTab: '.tab[data-tab="overview"]',
-      target: ".cards",
-      title: "Overview at a glance",
-      text: "On the Overview tab, these cards show your live numbers — bars made today, quality pass rate, and how many lines are running.",
+      target: "#stat-cards",
+      title: "Today at a glance",
+      text: "These four cards give you the day's headline numbers: total traffic in and out, current occupancy, the last detected vehicle move, and your latest system check-in.",
       side: "bottom",
     },
     {
-      target: "#new-batch",
-      title: "Start a new batch",
-      text: "This button kicks off a brand-new production batch. It's the fastest way to begin making candy.",
+      target: "#card-occupancy",
+      title: "Live occupancy",
+      text: "This one's key — it shows how full the garage is right now. 65 of 150 spaces are taken, so you're at 43% capacity.",
+      side: "bottom",
     },
     {
-      openTab: '.tab[data-tab="production"]',
-      target: "#start-line",
-      title: "Start the line",
-      text: "Now we're on the Production tab. The green Start Line button powers up a production line and begins making bars.",
+      target: "#occupancy-table",
+      title: "Occupancy breakdown",
+      text: "The table breaks occupancy down by location with a live capacity bar. The little pencil icons let you adjust the available and maximum counts inline.",
+      side: "top",
     },
     {
-      target: "#pause-line",
-      title: "Pause when you need to",
-      text: "Need to stop for maintenance? The Pause button safely halts the line without losing your batch.",
+      target: "#daily-traffic",
+      title: "Daily traffic trends",
+      text: "Here you can chart traffic across a date range — inbound in green, outbound in red, against the prior 7 days. Set the dates and hit Go to refresh.",
+      side: "right",
     },
     {
-      openTab: '.tab[data-tab="inventory"]',
-      target: "#add-stock",
-      title: "Keep stock topped up",
-      text: "On the Inventory tab, Add Stock lets you log new cocoa, sugar, and packaging as deliveries arrive.",
+      target: "#daily-export",
+      title: "Export your data",
+      text: "Need the raw numbers? The Export button downloads this report so you can share it or open it in a spreadsheet.",
+      side: "left",
     },
     {
-      openTab: '.tab[data-tab="reports"]',
-      target: "#generate-report",
-      title: "Generate reports",
-      text: "Finally, the Reports tab. Generate Report builds a full production summary you can share or export to CSV.",
+      target: "#hourly-traffic",
+      title: "Hour-by-hour view",
+      text: "This panel zooms into a single day so you can spot your busy and quiet hours at a glance.",
+      side: "left",
     },
     {
-      target: "#account-btn",
+      openTab: "#nav-signage",
+      target: '.nav-sub[data-sub="signage"]',
+      title: "Expandable menus",
+      text: "Some sections expand for more options. Signage, for example, opens up Designable Signs and Level Sign Overrides. Most menu groups work the same way.",
+      side: "right",
+      padding: 4,
+    },
+    {
+      target: "#nav-site-alerts",
+      title: "Stay on top of issues",
+      text: "Site Alerts and User Alerts flag anything that needs your attention — like a camera going offline or an unusual reading.",
+      side: "right",
+      padding: 4,
+    },
+    {
+      target: "#account-menu",
       title: "Your account",
-      text: "Up here is your account menu — settings, profile, and sign-out all live behind this button.",
+      text: "Finally, your profile, preferences, and sign-out all live up here under your name.",
       side: "left",
     },
     {
       title: "You're all set! 🎉",
-      text: "That's the whole dashboard! Click the 'Show me around' button any time you want me to run the tour again. Happy candy-making!",
+      text: "That's the EnSight dashboard! Click the 'Show me around' button any time to run this tour again. Happy monitoring!",
     },
   ],
-  onFinish: () => activateTab("overview"),
-  onSkip: () => activateTab("overview"),
 });
 
-// Show a floating launcher, and auto-start for first-time visitors.
+// Floating launcher + auto-start for first-time visitors.
 tour.mountLauncher("Show me around");
-if (!tour.completed) {
-  setTimeout(() => tour.start(), 600);
-}
+if (!tour.completed) setTimeout(() => tour.start(), 700);
 
-// expose for tinkering in the console
+// expose for console tinkering
 (window as unknown as { tour: Walkthrough }).tour = tour;

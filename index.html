@@ -3,80 +3,160 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Walkthrough — Demo</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍫</text></svg>" />
+    <title>EnSight Portal</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='44' fill='%23161a1d'/><ellipse cx='50' cy='50' rx='34' ry='20' fill='none' stroke='%2333a7e0' stroke-width='6'/><circle cx='50' cy='50' r='10' fill='%2333a7e0'/></svg>" />
     <link rel="stylesheet" href="/src/demo/demo.css" />
   </head>
   <body>
+    <!-- ===================== TOP BAR ===================== -->
     <header class="topbar">
-      <div class="brand"><span class="logo">🍫</span> Cocoa<strong>Works</strong></div>
-      <nav class="topnav">
-        <a href="#" class="active">Dashboard</a>
-        <a href="#">Team</a>
-        <a href="#">Docs</a>
-      </nav>
-      <button id="account-btn" class="icon-btn" aria-label="Account">👤</button>
+      <a class="brand" href="#" aria-label="EnSight Technologies">
+        <svg class="brand-eye" viewBox="0 0 64 40" aria-hidden="true">
+          <ellipse cx="32" cy="20" rx="29" ry="16" fill="none" stroke="#33a7e0" stroke-width="4" />
+          <circle cx="32" cy="20" r="9" fill="#33a7e0" />
+          <circle cx="29" cy="17" r="3" fill="#cdeafb" />
+        </svg>
+        <span class="brand-text">En<strong>Sight</strong><em>TECHNOLOGIES</em></span>
+      </a>
+
+      <div class="topbar-right">
+        <button id="site-picker" class="topbar-btn">2075 Broadway <span class="caret">▾</span></button>
+        <span class="topbar-divider"></span>
+        <button id="account-menu" class="topbar-btn">
+          <span class="avatar">👤</span> Kayle Schmoyer <span class="caret">▾</span>
+        </button>
+      </div>
     </header>
 
-    <main class="layout">
-      <h1 class="page-title">Production Dashboard</h1>
-      <p class="page-sub">Everything you need to run the candy line, in one place.</p>
+    <div class="shell">
+      <!-- ===================== SIDEBAR ===================== -->
+      <aside class="sidebar" id="sidebar">
+        <nav>
+          <a class="nav-item active" id="nav-dashboard" href="#"><i>◴</i> Dashboard</a>
 
-      <div class="tabs" role="tablist">
-        <button class="tab active" data-tab="overview" role="tab">Overview</button>
-        <button class="tab" data-tab="production" role="tab">Production</button>
-        <button class="tab" data-tab="inventory" role="tab">Inventory</button>
-        <button class="tab" data-tab="reports" role="tab">Reports</button>
-      </div>
+          <button class="nav-group" data-group="signage" id="nav-signage"><i>▥</i> Signage <span class="chev">▾</span></button>
+          <div class="nav-sub" data-sub="signage">
+            <a href="#" class="nav-subitem">Designable Signs</a>
+            <a href="#" class="nav-subitem">Level Sign Overrides</a>
+          </div>
 
-      <!-- Overview -->
-      <section class="panel active" data-panel="overview">
-        <div class="cards">
-          <div class="card"><span class="stat">12,480</span><span class="label">Bars made today</span></div>
-          <div class="card"><span class="stat">98.2%</span><span class="label">Quality pass rate</span></div>
-          <div class="card"><span class="stat">3</span><span class="label">Lines running</span></div>
-        </div>
-        <div class="row">
-          <button id="new-batch" class="btn btn-primary">+ New Batch</button>
-          <button id="refresh" class="btn">Refresh data</button>
-        </div>
-      </section>
+          <a class="nav-item" href="#"><i>▤</i> Occupancy Report</a>
+          <a class="nav-item" href="#"><i>▦</i> Truthing Report</a>
+          <a class="nav-item" href="#"><i>🧰</i> Truthing Tool</a>
 
-      <!-- Production -->
-      <section class="panel" data-panel="production" hidden>
-        <p class="panel-intro">Control the live production lines.</p>
-        <div class="row">
-          <button id="start-line" class="btn btn-success">▶ Start Line</button>
-          <button id="pause-line" class="btn btn-warning">❚❚ Pause Line</button>
-          <button id="recipe" class="btn">Edit Recipe</button>
-        </div>
-        <div class="line-status">Line 1 — <strong>Running</strong> · Milk Chocolate · 320 bars/min</div>
-      </section>
+          <button class="nav-group" data-group="users" id="nav-users"><i>👥</i> User Management <span class="chev">▾</span></button>
+          <div class="nav-sub" data-sub="users">
+            <a href="#" class="nav-subitem">Site users</a>
+            <a href="#" class="nav-subitem">Admin users</a>
+          </div>
 
-      <!-- Inventory -->
-      <section class="panel" data-panel="inventory" hidden>
-        <p class="panel-intro">Track cocoa, sugar, and packaging stock.</p>
-        <div class="row">
-          <button id="add-stock" class="btn btn-primary">+ Add Stock</button>
-          <button id="order-supplies" class="btn">Order Supplies</button>
-        </div>
-        <ul class="inv-list">
-          <li><span>Cocoa beans</span><span class="ok">Healthy</span></li>
-          <li><span>Sugar</span><span class="warn">Low</span></li>
-          <li><span>Foil wrap</span><span class="ok">Healthy</span></li>
-        </ul>
-      </section>
+          <a class="nav-item" id="nav-user-alerts" href="#"><i>👤</i> User Alerts <span class="beta">Beta</span></a>
+          <a class="nav-item" id="nav-site-alerts" href="#"><i>⚠</i> Site Alerts</a>
 
-      <!-- Reports -->
-      <section class="panel" data-panel="reports" hidden>
-        <p class="panel-intro">Generate and export production reports.</p>
-        <div class="row">
-          <button id="generate-report" class="btn btn-primary">Generate Report</button>
-          <button id="export-csv" class="btn">Export CSV</button>
-          <button id="schedule" class="btn">Schedule Email</button>
+          <button class="nav-group" data-group="admin" id="nav-admin"><i>⚙</i> Admin Tools <span class="chev">▾</span></button>
+          <div class="nav-sub" data-sub="admin">
+            <a href="#" class="nav-subitem">Config Generator</a>
+            <a href="#" class="nav-subitem">Remote Files</a>
+            <a href="#" class="nav-subitem">Space Sensor Cleanup</a>
+          </div>
+        </nav>
+        <button class="sidebar-collapse" aria-label="Collapse sidebar">«</button>
+      </aside>
+
+      <!-- ===================== MAIN ===================== -->
+      <main class="content">
+        <div class="page-head">
+          <div>
+            <h1 id="page-title">Admin Dashboard for 2075 Broadway</h1>
+            <p class="page-date">Monday June 15th 2026</p>
+          </div>
+          <span class="status-pill" title="System healthy">✔</span>
         </div>
-      </section>
-    </main>
+
+        <!-- stat cards -->
+        <section class="stat-cards" id="stat-cards">
+          <div class="stat-card">
+            <div class="stat-icon">🚦</div>
+            <div><div class="stat-label">Traffic Today All garages</div><div class="stat-value">+130 / -64</div></div>
+          </div>
+          <div class="stat-card" id="card-occupancy">
+            <div class="stat-icon">🚗</div>
+            <div><div class="stat-label">Total Occupancy</div><div class="stat-value">65/150 <span class="muted">(43%)</span></div></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">»</div>
+            <div><div class="stat-label">Last Move (ENS-CAM-L1-1)</div><div class="stat-value">4:27pm</div></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">☑</div>
+            <div><div class="stat-label">System Check-In (PRIMARY)</div><div class="stat-value">4:43pm</div></div>
+          </div>
+        </section>
+
+        <!-- occupancy table -->
+        <section class="panel occupancy" id="occupancy-table">
+          <div class="occ-pie">◔</div>
+          <table>
+            <thead>
+              <tr><th>Location</th><th>Occupied</th><th></th><th>Available</th><th>Max</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>2075 Broadway</td>
+                <td class="num">65 (43%)</td>
+                <td class="barcell"><div class="bar"><span style="width:43%"></span></div></td>
+                <td class="num">85 (57%)</td>
+                <td class="num"></td>
+              </tr>
+              <tr>
+                <td>Occupancy</td>
+                <td class="num">65 (43%)</td>
+                <td class="barcell"><div class="bar"><span style="width:43%"></span></div></td>
+                <td class="num">85 (57%) <button class="icon-edit" id="edit-available">✎</button></td>
+                <td class="num">150 <button class="icon-edit">✎</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- traffic charts -->
+        <div class="chart-row">
+          <section class="panel chart" id="daily-traffic">
+            <div class="chart-head"><h2>Daily Traffic</h2><button class="btn" id="daily-export">Export</button></div>
+            <div class="filter-row">
+              <input class="input" placeholder="Start YYYY-MM-DD" value="2026-06-08" />
+              <span class="to">to</span>
+              <input class="input" placeholder="End YYYY-MM-DD" value="2026-06-15" />
+              <button class="btn btn-primary" id="daily-go">Go</button>
+            </div>
+            <select class="input select"><option>All Entrances / Exits</option></select>
+            <div class="chart-canvas">
+              <svg viewBox="0 0 520 180" preserveAspectRatio="none">
+                <polyline class="line gray" points="0,150 75,120 150,135 225,90 300,110 375,70 445,95 520,60" />
+                <polyline class="line green" points="0,160 75,140 150,150 225,120 300,135 375,105 445,125 520,95" />
+                <polyline class="line red" points="0,168 75,158 150,162 225,150 300,156 375,140 445,150 520,132" />
+              </svg>
+            </div>
+            <div class="legend"><span class="lg gray">Total traffic</span><span class="lg green">Inbound</span><span class="lg red">Outbound</span><span class="lg dim">Prior 7 days</span></div>
+          </section>
+
+          <section class="panel chart" id="hourly-traffic">
+            <div class="chart-head"><h2>Hourly Traffic</h2><button class="btn" id="hourly-export">Export</button></div>
+            <div class="filter-row">
+              <input class="input" placeholder="YYYY-MM-DD" value="2026-06-15" />
+            </div>
+            <select class="input select"><option>All Entrances / Exits</option></select>
+            <div class="chart-canvas">
+              <svg viewBox="0 0 520 180" preserveAspectRatio="none">
+                <polyline class="line green" points="0,170 60,150 120,120 180,60 240,90 300,75 360,110 420,80 480,130 520,150" />
+                <polyline class="line red" points="0,172 60,160 120,150 180,120 240,140 300,130 360,150 420,135 480,158 520,165" />
+              </svg>
+            </div>
+            <div class="legend"><span class="lg gray">All traffic</span><span class="lg green">Inbound</span><span class="lg red">Outbound</span></div>
+          </section>
+        </div>
+      </main>
+    </div>
 
     <script type="module" src="/src/demo/main.ts"></script>
   </body>

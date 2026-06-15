@@ -28,8 +28,9 @@ narration). Perfect for onboarding, teaching, and product tours.
 
 ## 🚀 Run the demo locally
 
-This repo ships with a full demo (a fake "CocoaWorks" candy-factory dashboard) so
-you can see the whole effect immediately.
+This repo ships with a full demo — a mock of the **EnSight portal** (a parking
+garage occupancy / vehicle-counting admin dashboard) — so you can see the whole
+effect immediately.
 
 ### 1. Get the code
 
@@ -69,10 +70,11 @@ You'll see output like:
 Open **http://localhost:5173/** in your browser.
 
 The tour **auto-starts** on first visit — Pip pops up and guides you through the
-tabs and buttons. Try these:
+dashboard's sections and buttons. Try these:
 
 - Click **Next / Back** (or use arrow keys) to move through the steps.
-- Watch it **switch tabs automatically** (Overview → Production → Inventory → Reports).
+- Watch Pip spotlight each area — stat cards, the occupancy table, traffic charts —
+  and **auto-expand the sidebar's Signage menu** to show nested navigation.
 - Click the **🔊 speaker icon** to toggle spoken narration.
 - Click **Skip tour**, then use the floating **"Show me around"** button (bottom-right)
   to replay it any time.
@@ -183,7 +185,7 @@ src/
     styles.ts         ← self-injecting scoped CSS
     types.ts          ← public TypeScript API
     index.ts          ← exports
-  demo/               ← the CocoaWorks demo page that showcases it
+  demo/               ← the EnSight portal mock that showcases it
 index.html            ← demo entry
 ```
 
