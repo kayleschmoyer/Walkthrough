@@ -27,6 +27,7 @@ const tour = new Walkthrough({
       animations: {
         idle: "/avatar/anims/idle.glb",
         greet: "/avatar/anims/greet.glb",
+        walk: "/avatar/anims/walk.glb",
         gesture: "/avatar/anims/gesture.glb",
       },
     }),

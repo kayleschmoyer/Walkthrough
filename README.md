@@ -197,6 +197,7 @@ new Walkthrough({
       animations: {                            // retargeted by bone name
         idle: "/avatar/anims/idle.glb",
         greet: "/avatar/anims/greet.glb",
+        walk: "/avatar/anims/walk.glb",
         gesture: "/avatar/anims/gesture.glb",
       },
     }),
@@ -207,11 +208,11 @@ new Walkthrough({
 - The demo ships with a **custom cartoon guide** (`public/avatar/character.glb`) —
   a character generated in [3D AI Studio](https://www.3daistudio.com), auto-rigged
   on [Mixamo](https://www.mixamo.com), then decimated + texture-compressed for the
-  web (1 M verts / 80 MB → ~7 MB). Her Mixamo clips (idle / waving / talking) live
-  in [`public/avatar/anims/`](public/avatar/anims) as tiny animation-only `.glb`s.
-  three.js's lighter `RobotExpressive` robot is also bundled.
-- She **greets** you on the intro, **gestures** as she explains each step, and yaws
-  to face the element she's describing.
+  web (1 M verts / 80 MB → ~7 MB). Her Mixamo clips (idle / waving / walking /
+  pointing) live in [`public/avatar/anims/`](public/avatar/anims) as tiny
+  animation-only `.glb`s. three.js's lighter `RobotExpressive` robot is also bundled.
+- She **greets** you on the intro, **walks** over and **points** at each element as
+  she explains it, and yaws to face whatever she's describing.
 - **Make your own** the same way: generate a character (3D AI Studio, Ready Player
   Me, Avaturn…), rig + grab animations on Mixamo, export FBX, and I convert them to
   optimized `.glb`. Map clips to roles (`idle`/`greet`/`walk`/`gesture`) via
