@@ -5,3 +5,6 @@ dist/
 .vscode/
 .idea/
 npm-debug.log*
+
+# local test scripts
+_shot.mjs
