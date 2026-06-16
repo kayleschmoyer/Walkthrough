@@ -1,3 +1,5 @@
+import type { CharacterHandle } from "./character.ts";
+
 /** A single stop on the guided tour. */
 export interface WalkthroughStep {
   /**
@@ -33,6 +35,12 @@ export interface WalkthroughStep {
 export interface WalkthroughOptions {
   /** The ordered list of stops. */
   steps: WalkthroughStep[];
+
+  /**
+   * Provide the guide character. Defaults to the built-in animated SVG mascot.
+   * Pass `createAvatar3D` (or your own factory) for a real-time 3D avatar.
+   */
+  characterFactory?: () => CharacterHandle;
 
   /** The character's name, used in the intro and the bubble header. */
   characterName?: string;

@@ -167,13 +167,39 @@ tour.completed;      // boolean — has this user finished it before?
 
 ---
 
-## 🎨 Customizing the character
+## 🎭 The guide character (2D mascot or real-time 3D avatar)
 
-The mascot is plain inline SVG in
-[`src/walkthrough/character.ts`](src/walkthrough/character.ts) and is driven by CSS
-variables, so you can recolor it via `accentColor` or swap the SVG for your own
-brand art. The only contract is the `.wt-char-arm` group (the part that rotates to
-point) and the `point()` / `rest()` / `wave()` methods.
+There are two built-in characters, both satisfying the same `CharacterHandle`
+contract (`point()` / `rest()` / `wave()` / `hop()`), so the controller drives
+either one unchanged:
+
+### Animated SVG mascot (default)
+Plain inline SVG in [`character.ts`](src/walkthrough/character.ts), driven by CSS
+variables — recolor it with `accentColor` or swap the SVG for your own art. Tiny
+and dependency-free.
+
+### Real-time 3D avatar
+A rigged glTF character rendered with [three.js](https://threejs.org) that plays
+skeletal animations (idle / wave / jump / gesture) and yaws to face the element
+it's describing. Enable it with the `characterFactory` option:
+
+```ts
+import { Walkthrough, createAvatar3D } from "./walkthrough";
+
+new Walkthrough({
+  characterFactory: () => createAvatar3D({ url: "/avatar/RobotExpressive.glb" }),
+  steps: [ /* ... */ ],
+});
+```
+
+- The demo ships with three.js's `RobotExpressive` model in
+  [`public/avatar/`](public/avatar) so it works offline after clone.
+- **Swap in your own character** by pointing `url` at any rigged humanoid `.glb`
+  with named animation clips — e.g. a free [Ready Player Me](https://readyplayer.me)
+  avatar plus [Mixamo](https://mixamo.com) animations — to get a realistic human
+  guide instead of the robot.
+- Trade-off: this pulls in three.js (~150 kB gzipped) + the model file, so it's no
+  longer the tiny drop-in widget. Use the SVG mascot when bundle size matters.
 
 ## 📁 Project structure
 
@@ -182,10 +208,12 @@ src/
   walkthrough/        ← the reusable, framework-agnostic widget
     walkthrough.ts    ← the controller (positioning, narration, navigation)
     character.ts      ← the animated SVG mascot
+    avatar3d.ts       ← the real-time 3D avatar (three.js)
     styles.ts         ← self-injecting scoped CSS
     types.ts          ← public TypeScript API
     index.ts          ← exports
   demo/               ← the EnSight portal mock that showcases it
+public/avatar/        ← the bundled 3D model (RobotExpressive.glb)
 index.html            ← demo entry
 ```
 

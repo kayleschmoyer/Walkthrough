@@ -127,7 +127,7 @@ export class Walkthrough {
     const cluster = document.createElement("div");
     cluster.className = "wt-cluster";
 
-    this.character = createCharacter();
+    this.character = (this.opts.characterFactory ?? createCharacter)();
 
     const bubble = document.createElement("div");
     bubble.className = "wt-bubble";
@@ -397,6 +397,8 @@ export class Walkthrough {
     window.removeEventListener("scroll", this.relayout, true);
     window.removeEventListener("resize", this.relayout);
     window.removeEventListener("keydown", this.onKey);
+    this.character?.dispose?.();
+    this.character = undefined;
     this.root?.remove();
     this.root = undefined;
     this.launcher?.style.removeProperty("display");

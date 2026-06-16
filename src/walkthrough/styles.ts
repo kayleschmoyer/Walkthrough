@@ -75,6 +75,12 @@ export const STYLES = /* css */ `
   height: 112px;
 }
 .wt-char-svg { width: 100%; height: 100%; overflow: visible; animation: wt-bob 3s ease-in-out infinite; }
+
+/* 3D avatar variant: the WebGL canvas drives its own motion, so suppress the
+   SVG-oriented CSS animations. */
+.wt-character-3d { filter: drop-shadow(0 12px 14px rgba(0,0,0,0.45)); }
+.wt-character-3d canvas { display: block; width: 100% !important; height: 100% !important; }
+.wt-character-3d.wt-hopping { animation: none; }
 .wt-skull, .wt-char-body rect, .wt-limb, .wt-hand, .wt-finger { fill: var(--wt-accent); }
 .wt-foot { fill: color-mix(in srgb, var(--wt-accent) 72%, #000); }
 .wt-char-belly { fill: rgba(255, 255, 255, 0.16); }

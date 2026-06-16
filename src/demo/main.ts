@@ -1,4 +1,4 @@
-import { Walkthrough } from "../walkthrough/index.ts";
+import { Walkthrough, createAvatar3D } from "../walkthrough/index.ts";
 
 // --- portal behavior: expandable sidebar groups -----------------------
 document.querySelectorAll<HTMLButtonElement>(".nav-group").forEach((group) => {
@@ -16,6 +16,7 @@ const tour = new Walkthrough({
   accentColor: "#33a7e0", // EnSight blue
   speech: true,
   storageKey: "ensight-tour",
+  characterFactory: () => createAvatar3D(), // real-time 3D avatar
   steps: [
     {
       title: "Hi, I'm Pip! 👋",
