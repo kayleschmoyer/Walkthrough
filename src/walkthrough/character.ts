@@ -1,66 +1,76 @@
 /**
- * Builds the guide character as an inline SVG.
+ * Builds the guide character as an inline SVG — a full-body mascot with a head,
+ * body, two arms, and legs/feet so it reads as a little character that hops
+ * around the screen (rather than a floating head).
  *
- * The character is intentionally simple (a friendly rounded mascot) and is
- * driven entirely by CSS variables + a single rotatable arm, so it's easy to
- * restyle or swap for your own brand art later.
+ * It's driven by CSS variables + a single rotatable pointing arm, so it's easy
+ * to restyle (via `accentColor`) or swap for your own brand art.
  */
 export interface CharacterHandle {
   /** Root element to drop into the overlay. */
   el: HTMLElement;
   /** Aim the pointing arm at a point in viewport coordinates. */
   point(fromX: number, fromY: number, toX: number, toY: number): void;
-  /** Relax the arm to a neutral resting pose (used on "to camera" steps). */
+  /** Relax to a neutral resting pose (used on "to camera" steps). */
   rest(): void;
-  /** Play a quick wave (used on the intro step). */
+  /** Play a quick wave (used on the intro/outro). */
   wave(): void;
+  /** Play a hop — used when the character travels to a new step. */
+  hop(): void;
 }
 
 const SVG = `
-<svg class="wt-char-svg" viewBox="0 0 120 120" role="img" aria-hidden="true">
-  <!-- soft shadow -->
-  <ellipse class="wt-char-shadow" cx="60" cy="110" rx="30" ry="6" />
+<svg class="wt-char-svg" viewBox="0 0 120 152" role="img" aria-hidden="true">
+  <ellipse class="wt-char-shadow" cx="60" cy="146" rx="30" ry="6" />
 
-  <!-- back (pointing) arm — rotates from the shoulder -->
+  <!-- legs -->
+  <g class="wt-legs">
+    <g class="wt-leg wt-leg-l">
+      <rect class="wt-limb" x="46" y="104" width="9" height="24" rx="4.5" />
+      <ellipse class="wt-foot" cx="47" cy="130" rx="11" ry="6" />
+    </g>
+    <g class="wt-leg wt-leg-r">
+      <rect class="wt-limb" x="65" y="104" width="9" height="24" rx="4.5" />
+      <ellipse class="wt-foot" cx="73" cy="130" rx="11" ry="6" />
+    </g>
+  </g>
+
+  <!-- left arm (swings while hopping) -->
+  <g class="wt-arm-left">
+    <rect class="wt-limb" x="20" y="78" width="18" height="12" rx="6" />
+    <circle class="wt-hand" cx="22" cy="84" r="7.5" />
+  </g>
+
+  <!-- right arm — the pointer; rotates from the shoulder -->
   <g class="wt-char-arm">
-    <rect x="56" y="58" width="40" height="13" rx="6.5" />
-    <circle class="wt-char-hand" cx="98" cy="64" r="9" />
-    <!-- pointing finger -->
-    <rect class="wt-char-finger" x="104" y="61" width="11" height="6" rx="3" />
+    <rect class="wt-limb" x="80" y="78" width="34" height="12" rx="6" />
+    <circle class="wt-hand" cx="113" cy="84" r="8.5" />
+    <rect class="wt-finger" x="119" y="81" width="10" height="6" rx="3" />
   </g>
 
   <!-- body -->
   <g class="wt-char-body">
-    <path d="M60 18
-             C82 18 96 34 96 60
-             C96 86 82 102 60 102
-             C38 102 24 86 24 60
-             C24 34 38 18 60 18 Z" />
-    <!-- belly highlight -->
-    <ellipse class="wt-char-belly" cx="60" cy="66" rx="20" ry="22" />
+    <rect x="33" y="62" width="54" height="52" rx="21" />
+    <ellipse class="wt-char-belly" cx="60" cy="90" rx="16" ry="17" />
   </g>
 
-  <!-- front (resting) arm -->
-  <rect class="wt-char-arm-front" x="24" y="60" width="16" height="12" rx="6" />
-
-  <!-- face -->
-  <g class="wt-char-face">
-    <g class="wt-eyes">
-      <circle cx="49" cy="56" r="8" fill="#ffffff" />
-      <circle cx="71" cy="56" r="8" fill="#ffffff" />
-      <circle class="wt-pupil" cx="50" cy="57" r="4" />
-      <circle class="wt-pupil" cx="72" cy="57" r="4" />
+  <!-- head -->
+  <g class="wt-char-head">
+    <line class="wt-antenna" x1="60" y1="10" x2="60" y2="0" />
+    <circle class="wt-antenna-tip" cx="60" cy="-2" r="4.5" />
+    <circle class="wt-skull" cx="60" cy="40" r="32" />
+    <g class="wt-face">
+      <g class="wt-eyes">
+        <circle cx="49" cy="40" r="9" fill="#ffffff" />
+        <circle cx="71" cy="40" r="9" fill="#ffffff" />
+        <circle class="wt-pupil" cx="50" cy="41" r="4.5" />
+        <circle class="wt-pupil" cx="72" cy="41" r="4.5" />
+      </g>
+      <circle class="wt-cheek" cx="41" cy="52" r="5" />
+      <circle class="wt-cheek" cx="79" cy="52" r="5" />
+      <path class="wt-smile" d="M51 54 Q60 64 69 54" fill="none" />
     </g>
-    <!-- cheeks -->
-    <circle class="wt-cheek" cx="42" cy="70" r="5" />
-    <circle class="wt-cheek" cx="78" cy="70" r="5" />
-    <!-- smile -->
-    <path class="wt-smile" d="M50 74 Q60 84 70 74" fill="none" />
   </g>
-
-  <!-- antenna -->
-  <line class="wt-antenna" x1="60" y1="18" x2="60" y2="6" />
-  <circle class="wt-antenna-tip" cx="60" cy="5" r="4" />
 </svg>
 `;
 
@@ -90,6 +100,17 @@ export function createCharacter(): CharacterHandle {
     el.classList.add("wt-waving");
   }
 
+  function hop() {
+    el.classList.remove("wt-hopping");
+    void el.offsetWidth; // restart the animation
+    el.classList.add("wt-hopping");
+    el.addEventListener(
+      "animationend",
+      () => el.classList.remove("wt-hopping"),
+      { once: true },
+    );
+  }
+
   rest();
-  return { el, point, rest, wave };
+  return { el, point, rest, wave, hop };
 }

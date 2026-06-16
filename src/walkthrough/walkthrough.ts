@@ -33,8 +33,11 @@ export class Walkthrough {
   private launcher?: HTMLButtonElement;
 
   private typeTimer?: number;
+  private glideTimer?: number;
   private fullText = "";
   private active = false;
+  private shown = false;
+  private gliding = false;
 
   constructor(options: WalkthroughOptions) {
     this.opts = {
@@ -184,10 +187,22 @@ export class Walkthrough {
     }
 
     this.renderStep(step, target);
-    this.layout(step, target);
-    this.cluster?.classList.remove("wt-pop");
-    void this.cluster?.offsetWidth; // restart pop animation
-    this.cluster?.classList.add("wt-pop");
+
+    if (!this.shown) {
+      // First appearance: drop into place instantly, then pop in.
+      this.shown = true;
+      this.layout(step, target, false);
+      this.cluster?.classList.remove("wt-pop");
+      void this.cluster?.offsetWidth;
+      this.cluster?.classList.add("wt-pop");
+    } else {
+      // Every step after: physically hop + glide across to the new spot.
+      this.gliding = true;
+      window.clearTimeout(this.glideTimer);
+      this.glideTimer = window.setTimeout(() => (this.gliding = false), 660);
+      this.layout(step, target, true);
+      this.character?.hop();
+    }
 
     step.onShow?.(step, this.index);
     this.opts.onStep?.(step, this.index);
@@ -222,7 +237,7 @@ export class Walkthrough {
   }
 
   /** Position the spotlight + character cluster relative to the target. */
-  private layout(step: WalkthroughStep, target: HTMLElement | null): void {
+  private layout(step: WalkthroughStep, target: HTMLElement | null, animate: boolean): void {
     const vw = window.innerWidth;
     const vh = window.innerHeight;
     const cluster = this.cluster!;
@@ -239,8 +254,7 @@ export class Walkthrough {
       cluster.style.flexDirection = "row";
       const cw = cluster.offsetWidth;
       const ch = cluster.offsetHeight;
-      cluster.style.left = `${(vw - cw) / 2}px`;
-      cluster.style.top = `${(vh - ch) / 2}px`;
+      this.setClusterPos((vw - cw) / 2, (vh - ch) / 2, animate);
       return;
     }
 
@@ -285,8 +299,7 @@ export class Walkthrough {
       top = r.bottom + GAP;
     }
 
-    cluster.style.left = `${clamp(left, 12, vw - cw - 12)}px`;
-    cluster.style.top = `${top}px`;
+    this.setClusterPos(clamp(left, 12, vw - cw - 12), top, animate);
 
     // Aim the arm at the target's center from the character's actual position.
     requestAnimationFrame(() => {
@@ -304,8 +317,18 @@ export class Walkthrough {
     if (!this.active || this.index < 0) return;
     const step = this.steps[this.index];
     const target = step.target ? this.resolve(step.target) : null;
-    this.layout(step, target);
+    // Track scroll/resize instantly, except during the brief glide window
+    // after a step change, where we keep it smooth.
+    this.layout(step, target, this.gliding);
   };
+
+  /** Move the guide cluster, gliding when `animate` is set, else instantly. */
+  private setClusterPos(left: number, top: number, animate: boolean): void {
+    const c = this.cluster!;
+    c.classList.toggle("wt-glide", animate);
+    c.style.left = `${left}px`;
+    c.style.top = `${top}px`;
+  }
 
   // ---- narration ----------------------------------------------------
 
@@ -366,6 +389,9 @@ export class Walkthrough {
 
   private teardown(): void {
     this.active = false;
+    this.shown = false;
+    this.gliding = false;
+    window.clearTimeout(this.glideTimer);
     this.finishTyping();
     window.speechSynthesis?.cancel();
     window.removeEventListener("scroll", this.relayout, true);

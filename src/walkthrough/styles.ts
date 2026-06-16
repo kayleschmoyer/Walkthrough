@@ -54,10 +54,13 @@ export const STYLES = /* css */ `
   position: fixed;
   display: flex;
   align-items: flex-end;
-  gap: 10px;
+  gap: 8px;
   pointer-events: none;
-  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: transform;
+  /* glide between steps; .glide controls left/top easing (toggled in JS) */
+}
+.wt-cluster.wt-glide {
+  transition: left 0.62s cubic-bezier(0.5, 0, 0.2, 1),
+              top 0.62s cubic-bezier(0.5, 0, 0.2, 1);
 }
 .wt-cluster.wt-pop { animation: wt-pop 0.5s cubic-bezier(0.18, 1.3, 0.4, 1); }
 @keyframes wt-pop {
@@ -68,41 +71,65 @@ export const STYLES = /* css */ `
 /* ---- character ------------------------------------------------------ */
 .wt-character {
   flex: 0 0 auto;
-  width: 96px;
-  height: 96px;
-  animation: wt-bob 3s ease-in-out infinite;
+  width: 88px;
+  height: 112px;
 }
-.wt-char-svg { width: 100%; height: 100%; overflow: visible; }
-.wt-char-body path { fill: var(--wt-accent); }
+.wt-char-svg { width: 100%; height: 100%; overflow: visible; animation: wt-bob 3s ease-in-out infinite; }
+.wt-skull, .wt-char-body rect, .wt-limb, .wt-hand, .wt-finger { fill: var(--wt-accent); }
+.wt-foot { fill: color-mix(in srgb, var(--wt-accent) 72%, #000); }
 .wt-char-belly { fill: rgba(255, 255, 255, 0.16); }
-.wt-char-shadow { fill: rgba(15, 18, 34, 0.18); animation: wt-shadow 3s ease-in-out infinite; }
+.wt-char-shadow { fill: rgba(15, 18, 34, 0.22); animation: wt-shadow 3s ease-in-out infinite; }
 .wt-pupil { fill: #1f2430; transform-origin: center; animation: wt-look 5s ease-in-out infinite; }
-.wt-cheek { fill: #ff7eb6; opacity: 0.55; }
+.wt-cheek { fill: #ff7eb6; opacity: 0.5; }
 .wt-smile { stroke: #1f2430; stroke-width: 3; stroke-linecap: round; }
 .wt-antenna { stroke: var(--wt-accent); stroke-width: 3; stroke-linecap: round; }
 .wt-antenna-tip { fill: var(--wt-accent); animation: wt-glow 2s ease-in-out infinite; }
-.wt-char-hand, .wt-char-finger { fill: var(--wt-accent); }
-.wt-char-arm rect, .wt-char-arm-front { fill: var(--wt-accent); }
 
 /* eyes blink */
-.wt-eyes { transform-origin: 60px 56px; animation: wt-blink 4.2s infinite; }
+.wt-eyes { transform-origin: 60px 40px; animation: wt-blink 4.2s infinite; }
 
 /* pointing arm */
 .wt-char-arm {
-  transform-origin: 58px 64px;
+  transform-origin: 84px 84px;
   transform: rotate(var(--wt-arm-angle, 35deg));
   transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .wt-character.wt-pointing .wt-char-arm { animation: wt-point-nudge 1.1s ease-in-out infinite; }
-.wt-character.wt-waving  .wt-char-arm { animation: wt-wave 0.6s ease-in-out 3; transform-origin: 58px 64px; }
+.wt-character.wt-waving  .wt-char-arm { animation: wt-wave 0.6s ease-in-out 3; }
 
-@keyframes wt-bob    { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
-@keyframes wt-shadow { 0%,100% { transform: scaleX(1); opacity: 0.18; } 50% { transform: scaleX(0.82); opacity: 0.12; } }
+/* left arm + legs */
+.wt-arm-left { transform-origin: 30px 84px; }
+.wt-leg-l { transform-origin: 50px 104px; }
+.wt-leg-r { transform-origin: 70px 104px; }
+
+/* hop: the whole character leaps + squashes on landing */
+.wt-character.wt-hopping { animation: wt-hop 0.62s cubic-bezier(0.3, 0.7, 0.25, 1); }
+.wt-character.wt-hopping .wt-legs     { animation: wt-legtuck 0.62s ease-in-out; }
+.wt-character.wt-hopping .wt-arm-left { animation: wt-armswing 0.62s ease-in-out; }
+
+@keyframes wt-bob    { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+@keyframes wt-shadow { 0%,100% { transform: scaleX(1); opacity: 0.22; } 50% { transform: scaleX(0.82); opacity: 0.14; } }
 @keyframes wt-blink  { 0%,92%,100% { transform: scaleY(1); } 96% { transform: scaleY(0.1); } }
 @keyframes wt-look   { 0%,40% { transform: translateX(0); } 50%,70% { transform: translateX(-2.5px); } 85%,100% { transform: translateX(0); } }
 @keyframes wt-glow   { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
 @keyframes wt-point-nudge { 0%,100% { transform: rotate(var(--wt-arm-angle, 35deg)); } 50% { transform: rotate(calc(var(--wt-arm-angle, 35deg) - 8deg)); } }
-@keyframes wt-wave   { 0%,100% { transform: rotate(-60deg); } 50% { transform: rotate(-95deg); } }
+@keyframes wt-wave   { 0%,100% { transform: rotate(-55deg); } 50% { transform: rotate(-90deg); } }
+@keyframes wt-hop {
+  0%   { transform: translateY(0) scale(1, 1); }
+  18%  { transform: translateY(2px) scale(1.12, 0.86); }   /* crouch */
+  42%  { transform: translateY(-30px) scale(0.92, 1.12); } /* launch */
+  70%  { transform: translateY(0) scale(1, 1); }
+  82%  { transform: translateY(0) scale(1.12, 0.86); }     /* land squash */
+  100% { transform: translateY(0) scale(1, 1); }
+}
+@keyframes wt-legtuck {
+  0%,100% { transform: translateY(0); }
+  42%     { transform: translateY(-7px) scaleY(0.8); }
+}
+@keyframes wt-armswing {
+  0%,100% { transform: rotate(0deg); }
+  42%     { transform: rotate(-38deg); }
+}
 
 /* ---- speech bubble -------------------------------------------------- */
 .wt-bubble {
