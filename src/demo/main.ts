@@ -16,18 +16,17 @@ const tour = new Walkthrough({
   accentColor: "#33a7e0", // EnSight blue
   speech: true,
   storageKey: "ensight-tour",
-  // Real-time 3D avatar (Ready Player Me rig) with fun animations retargeted
-  // from the RPM animation library. Swap `url` for your own avatar.
+  // Real-time 3D avatar — custom character (3D AI Studio mesh, Mixamo-rigged),
+  // animated with her own Mixamo clips. Swap `url` to change the character.
   characterFactory: () =>
     createAvatar3D({
       url: "/avatar/character.glb",
-      width: 200,
-      height: 300,
-      camera: { y: 0.9, z: 3.1, lookY: 0.9, fov: 34 },
+      width: 210,
+      height: 320,
+      camera: { y: 0.0, z: 1.95, lookY: 0.0, fov: 32 },
       animations: {
         idle: "/avatar/anims/idle.glb",
         greet: "/avatar/anims/greet.glb",
-        walk: "/avatar/anims/walk.glb",
         gesture: "/avatar/anims/gesture.glb",
       },
     }),

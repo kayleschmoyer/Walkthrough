@@ -197,7 +197,6 @@ new Walkthrough({
       animations: {                            // retargeted by bone name
         idle: "/avatar/anims/idle.glb",
         greet: "/avatar/anims/greet.glb",
-        walk: "/avatar/anims/walk.glb",
         gesture: "/avatar/anims/gesture.glb",
       },
     }),
@@ -205,19 +204,19 @@ new Walkthrough({
 });
 ```
 
-- The demo ships with a **fun, stylized character** (`public/avatar/character.glb`,
-  a Ready Player Me rig) animated with clips from the free
-  [RPM animation library](https://github.com/readyplayerme/animation-library), plus
-  three.js's lighter `RobotExpressive` robot — all in
-  [`public/avatar/`](public/avatar) so the demo works offline after clone.
-- She **greets** you on the intro, **walks** over and **gestures** as she explains
-  each step, and yaws to face the element she's describing.
-- The character is a **placeholder** — swap in your own by pointing `url` at any
-  rigged humanoid `.glb`. Make a free avatar at
-  [Ready Player Me](https://readyplayer.me) (cartoony/fun) or
-  [Avaturn](https://avaturn.me) (realistic), grab animations from the RPM library or
-  [Mixamo](https://mixamo.com), and map them via `animations` (external clips) or
-  `anims` (clips embedded in the model). See [`src/demo/main.ts`](src/demo/main.ts).
+- The demo ships with a **custom cartoon guide** (`public/avatar/character.glb`) —
+  a character generated in [3D AI Studio](https://www.3daistudio.com), auto-rigged
+  on [Mixamo](https://www.mixamo.com), then decimated + texture-compressed for the
+  web (1 M verts / 80 MB → ~7 MB). Her Mixamo clips (idle / waving / talking) live
+  in [`public/avatar/anims/`](public/avatar/anims) as tiny animation-only `.glb`s.
+  three.js's lighter `RobotExpressive` robot is also bundled.
+- She **greets** you on the intro, **gestures** as she explains each step, and yaws
+  to face the element she's describing.
+- **Make your own** the same way: generate a character (3D AI Studio, Ready Player
+  Me, Avaturn…), rig + grab animations on Mixamo, export FBX, and I convert them to
+  optimized `.glb`. Map clips to roles (`idle`/`greet`/`walk`/`gesture`) via
+  `animations` (external clips) or `anims` (clips embedded in the model). See
+  [`src/demo/main.ts`](src/demo/main.ts).
 - Trade-off: this pulls in three.js (~150 kB gzipped) + the model + clip files, so
   it's no longer the tiny drop-in widget. Use the SVG mascot, or the much smaller
   robot, when bundle size matters.
