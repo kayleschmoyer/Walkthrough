@@ -34,6 +34,7 @@ export class Walkthrough {
 
   private typeTimer?: number;
   private glideTimer?: number;
+  private talkTimer?: number;
   private voice?: SpeechSynthesisVoice | null;
   private fullText = "";
   private active = false;
@@ -254,6 +255,23 @@ export class Walkthrough {
 
     this.typeText(step.text);
     this.speak(step.text);
+    this.beginTalking(step.text);
+  }
+
+  /** Drive the character's "speaking" animation for the duration of narration. */
+  private beginTalking(text: string): void {
+    this.character?.startTalking?.();
+    window.clearTimeout(this.talkTimer);
+    // Fallback stop (covers muted / voiceless browsers where speech onend
+    // never fires): roughly estimate spoken length from the word count.
+    const words = text.trim().split(/\s+/).length;
+    const est = Math.max(1600, (words / 2.7) * 1000 + 700);
+    this.talkTimer = window.setTimeout(() => this.endTalking(), est);
+  }
+
+  private endTalking(): void {
+    window.clearTimeout(this.talkTimer);
+    this.character?.stopTalking?.();
   }
 
   /** Position the spotlight + character cluster relative to the target. */
@@ -390,6 +408,8 @@ export class Walkthrough {
     if (v) u.voice = v;
     u.rate = 1.0;
     u.pitch = 1.05;
+    u.onend = () => this.endTalking();
+    u.onerror = () => this.endTalking();
     window.speechSynthesis.speak(u);
   }
 
@@ -446,6 +466,7 @@ export class Walkthrough {
     this.active = false;
     this.shown = false;
     this.gliding = false;
+    this.endTalking();
     window.clearTimeout(this.glideTimer);
     this.finishTyping();
     window.speechSynthesis?.cancel();

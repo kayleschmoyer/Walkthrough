@@ -218,6 +218,10 @@ new Walkthrough({
   falls back to a wave when they're absent.)
 - Narration auto-picks a natural female English voice (override with the `voice`
   option, e.g. `voice: "Samantha"`).
+- While narrating she **"talks"** with procedural head/neck motion synced to the
+  narration. (The generated mesh has no facial blendshapes or jaw bone, so true
+  viseme lip-sync isn't possible on it — for real mouth movement, use an avatar
+  with ARKit blendshapes, e.g. Ready Player Me, and drive its visemes.)
 - **Make your own** the same way: generate a character (3D AI Studio, Ready Player
   Me, Avaturn…), rig + grab animations on Mixamo, export FBX, and I convert them to
   optimized `.glb`. Map clips to roles (`idle`/`greet`/`walk`/`gesture`) via

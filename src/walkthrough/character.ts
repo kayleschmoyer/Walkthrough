@@ -21,6 +21,10 @@ export interface CharacterHandle {
   entrance?(): void;
   /** Optional: a celebration, played on the final step. */
   celebrate?(): void;
+  /** Optional: begin a "speaking" animation while narration plays. */
+  startTalking?(): void;
+  /** Optional: stop the "speaking" animation. */
+  stopTalking?(): void;
   /** Optional cleanup hook (e.g. tear down a WebGL context). */
   dispose?(): void;
 }

@@ -21,9 +21,9 @@ const tour = new Walkthrough({
   characterFactory: () =>
     createAvatar3D({
       url: "/avatar/character.glb",
-      width: 210,
-      height: 320,
-      camera: { y: 0.0, z: 1.95, lookY: 0.0, fov: 32 },
+      width: 240,
+      height: 360,
+      camera: { y: 0.12, z: 1.85, lookY: 0.08, fov: 31 },
       animations: {
         idle: "/avatar/anims/idle.glb",
         greet: "/avatar/anims/greet.glb",

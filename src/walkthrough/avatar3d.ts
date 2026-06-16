@@ -71,10 +71,14 @@ export function createAvatar3D(opts: Avatar3DOptions = {}): CharacterHandle {
   // ---- state ----------------------------------------------------------
   let model: THREE.Object3D | undefined;
   let mixer: THREE.AnimationMixer | undefined;
+  let head: THREE.Object3D | null = null;
+  let neck: THREE.Object3D | null = null;
   const actions = new Map<Role, THREE.AnimationAction>();
   let active: THREE.AnimationAction | undefined;
   let targetYaw = baseYaw;
   let walkTimer = 0;
+  let talking = false;
+  let talkAmp = 0;
   let pending: (() => void) | undefined;
   const clock = new THREE.Clock();
   const loader = new GLTFLoader();
@@ -112,6 +116,8 @@ export function createAvatar3D(opts: Avatar3DOptions = {}): CharacterHandle {
     model = gltf.scene;
     model.rotation.y = baseYaw;
     scene.add(model);
+    head = model.getObjectByName("mixamorig:Head") ?? model.getObjectByName("Head") ?? null;
+    neck = model.getObjectByName("mixamorig:Neck") ?? model.getObjectByName("Neck") ?? null;
     mixer = new THREE.AnimationMixer(model);
 
     if (opts.animations) {
@@ -138,6 +144,20 @@ export function createAvatar3D(opts: Avatar3DOptions = {}): CharacterHandle {
   const tick = () => {
     raf = requestAnimationFrame(tick);
     mixer?.update(clock.getDelta());
+
+    // Procedural "talking": additive head/neck motion with a speech-like
+    // cadence, ramped in/out so it blends with the idle pose. (The mesh has no
+    // mouth blendshapes, so this sells speaking via head movement.)
+    talkAmp += ((talking ? 1 : 0) - talkAmp) * 0.12;
+    if (talkAmp > 0.001 && head) {
+      const t = performance.now() / 1000;
+      const cadence = Math.sin(t * 11) * 0.5 + 0.5; // fast syllable-like beat
+      head.rotation.x += talkAmp * (0.05 * Math.sin(t * 2.3) + 0.035 * cadence);
+      head.rotation.z += talkAmp * (0.03 * Math.sin(t * 1.6));
+      head.rotation.y += talkAmp * (0.025 * Math.sin(t * 0.9));
+      if (neck) neck.rotation.x += talkAmp * 0.02 * Math.sin(t * 2.3);
+    }
+
     if (model) model.rotation.y += (targetYaw - model.rotation.y) * 0.12;
     renderer.render(scene, camera);
   };
@@ -176,6 +196,12 @@ export function createAvatar3D(opts: Avatar3DOptions = {}): CharacterHandle {
     celebrate() {
       targetYaw = baseYaw;
       run(() => emote("celebrate"));
+    },
+    startTalking() {
+      talking = true;
+    },
+    stopTalking() {
+      talking = false;
     },
     dispose() {
       cancelAnimationFrame(raf);
