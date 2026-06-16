@@ -16,14 +16,20 @@ const tour = new Walkthrough({
   accentColor: "#33a7e0", // EnSight blue
   speech: true,
   storageKey: "ensight-tour",
-  // Real-time 3D human avatar (Avaturn rig). Swap `url` for your own avatar.
+  // Real-time 3D avatar (Ready Player Me rig) with fun animations retargeted
+  // from the RPM animation library. Swap `url` for your own avatar.
   characterFactory: () =>
     createAvatar3D({
-      url: "/avatar/human.glb",
+      url: "/avatar/character.glb",
       width: 200,
-      height: 290,
-      camera: { y: 0.95, z: 3.05, lookY: 0.92, fov: 34 },
-      anims: { idle: "IdleV4.2(maya_head)", greet: "greet", walk: "walking", gesture: "think" },
+      height: 300,
+      camera: { y: 0.9, z: 3.1, lookY: 0.9, fov: 34 },
+      animations: {
+        idle: "/avatar/anims/idle.glb",
+        greet: "/avatar/anims/greet.glb",
+        walk: "/avatar/anims/walk.glb",
+        gesture: "/avatar/anims/gesture.glb",
+      },
     }),
   steps: [
     {

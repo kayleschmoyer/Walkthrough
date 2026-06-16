@@ -183,29 +183,44 @@ A rigged glTF character rendered with [three.js](https://threejs.org) that plays
 skeletal animations (idle / wave / jump / gesture) and yaws to face the element
 it's describing. Enable it with the `characterFactory` option:
 
+Animations are referenced by **logical role** (`idle` / `greet` / `walk` /
+`gesture`), so any rigged humanoid works. Point `animations` at separate
+animation `.glb` files to retarget them onto a model that ships none:
+
 ```ts
 import { Walkthrough, createAvatar3D } from "./walkthrough";
 
 new Walkthrough({
-  characterFactory: () => createAvatar3D({ url: "/avatar/RobotExpressive.glb" }),
+  characterFactory: () =>
+    createAvatar3D({
+      url: "/avatar/character.glb",            // a rigged humanoid
+      animations: {                            // retargeted by bone name
+        idle: "/avatar/anims/idle.glb",
+        greet: "/avatar/anims/greet.glb",
+        walk: "/avatar/anims/walk.glb",
+        gesture: "/avatar/anims/gesture.glb",
+      },
+    }),
   steps: [ /* ... */ ],
 });
 ```
 
-- The demo ships with a **realistic human avatar** (`public/avatar/human.glb`, an
-  Avaturn rig with idle / greet / walk / think clips) and also includes three.js's
-  stylized `RobotExpressive`. Both are bundled in [`public/avatar/`](public/avatar)
-  so the demo works offline after clone.
-- The human is a **placeholder** — swap in your own by pointing `url` at any rigged
-  humanoid `.glb` with named animation clips. Good sources:
-  [Ready Player Me](https://readyplayer.me) or [Avaturn](https://avaturn.me)
-  avatars, plus [Mixamo](https://mixamo.com) animations. Then map the clip names
-  via the `anims` option (see [`src/demo/main.ts`](src/demo/main.ts)).
-- The avatar walks to travel between steps, plays a greeting on the intro, and
-  yaws to face the element it's describing.
-- Trade-off: this pulls in three.js (~150 kB gzipped) + the model file (the human is
-  ~5 MB), so it's no longer the tiny drop-in widget. Use the SVG mascot, or the much
-  smaller robot, when bundle size matters.
+- The demo ships with a **fun, stylized character** (`public/avatar/character.glb`,
+  a Ready Player Me rig) animated with clips from the free
+  [RPM animation library](https://github.com/readyplayerme/animation-library), plus
+  three.js's lighter `RobotExpressive` robot — all in
+  [`public/avatar/`](public/avatar) so the demo works offline after clone.
+- She **greets** you on the intro, **walks** over and **gestures** as she explains
+  each step, and yaws to face the element she's describing.
+- The character is a **placeholder** — swap in your own by pointing `url` at any
+  rigged humanoid `.glb`. Make a free avatar at
+  [Ready Player Me](https://readyplayer.me) (cartoony/fun) or
+  [Avaturn](https://avaturn.me) (realistic), grab animations from the RPM library or
+  [Mixamo](https://mixamo.com), and map them via `animations` (external clips) or
+  `anims` (clips embedded in the model). See [`src/demo/main.ts`](src/demo/main.ts).
+- Trade-off: this pulls in three.js (~150 kB gzipped) + the model + clip files, so
+  it's no longer the tiny drop-in widget. Use the SVG mascot, or the much smaller
+  robot, when bundle size matters.
 
 ## 📁 Project structure
 
@@ -219,7 +234,7 @@ src/
     types.ts          ← public TypeScript API
     index.ts          ← exports
   demo/               ← the EnSight portal mock that showcases it
-public/avatar/        ← bundled 3D models (human.glb, RobotExpressive.glb)
+public/avatar/        ← bundled 3D character + RobotExpressive, plus anims/
 index.html            ← demo entry
 ```
 
