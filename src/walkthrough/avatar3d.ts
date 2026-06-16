@@ -13,7 +13,7 @@ import type { CharacterHandle } from "./character.ts";
  *  - point `animations` at separate animation `.glb` files (e.g. the Ready
  *    Player Me animation library) to retarget onto a model that ships none.
  */
-type Role = "idle" | "greet" | "walk" | "gesture";
+type Role = "idle" | "greet" | "walk" | "gesture" | "entrance" | "celebrate";
 
 export interface Avatar3DOptions {
   /** URL of the rigged character `.glb`. */
@@ -166,6 +166,14 @@ export function createAvatar3D(opts: Avatar3DOptions = {}): CharacterHandle {
         window.clearTimeout(walkTimer);
         walkTimer = window.setTimeout(() => emote("gesture"), 700);
       });
+    },
+    entrance() {
+      targetYaw = baseYaw;
+      run(() => emote("entrance"));
+    },
+    celebrate() {
+      targetYaw = baseYaw;
+      run(() => emote("celebrate"));
     },
     dispose() {
       cancelAnimationFrame(raf);

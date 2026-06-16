@@ -17,6 +17,10 @@ export interface CharacterHandle {
   wave(): void;
   /** Play a hop — used when the character travels to a new step. */
   hop(): void;
+  /** Optional: a one-time entrance, played the first time the guide appears. */
+  entrance?(): void;
+  /** Optional: a celebration, played on the final step. */
+  celebrate?(): void;
   /** Optional cleanup hook (e.g. tear down a WebGL context). */
   dispose?(): void;
 }

@@ -201,7 +201,7 @@ export class Walkthrough {
       window.clearTimeout(this.glideTimer);
       this.glideTimer = window.setTimeout(() => (this.gliding = false), 660);
       this.layout(step, target, true);
-      this.character?.hop();
+      if (target) this.character?.hop();
     }
 
     step.onShow?.(step, this.index);
@@ -226,7 +226,15 @@ export class Walkthrough {
     });
 
     if (!target) {
-      this.character!.wave();
+      // "To camera" steps: celebrate on the last step, make an entrance on the
+      // first, otherwise just wave. Falls back to wave if the character has no
+      // entrance/celebrate (e.g. the SVG mascot).
+      const c = this.character!;
+      const isLast = this.index === this.steps.length - 1;
+      const isFirst = this.index === 0;
+      if (isLast && c.celebrate) c.celebrate();
+      else if (isFirst && c.entrance) c.entrance();
+      else c.wave();
       this.spotlight!.classList.add("wt-no-target");
     } else {
       this.spotlight!.classList.remove("wt-no-target");
