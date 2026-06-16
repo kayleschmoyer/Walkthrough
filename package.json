@@ -1,0 +1,45 @@
+{
+  "name": "walkthrough",
+  "version": "0.1.0",
+  "description": "An animated, character-guided product walkthrough that teaches users your UI one step at a time.",
+  "type": "module",
+  "main": "./dist/walkthrough.js",
+  "module": "./dist/walkthrough.js",
+  "types": "./dist/walkthrough/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/walkthrough/index.d.ts",
+      "import": "./dist/walkthrough.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "build:lib": "tsc && vite build --mode lib",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "walkthrough",
+    "onboarding",
+    "product-tour",
+    "guided-tour",
+    "tutorial",
+    "tooltip",
+    "spotlight"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^25.9.3",
+    "@types/three": "^0.160.0",
+    "playwright-core": "^1.48.0",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.10"
+  },
+  "dependencies": {
+    "three": "^0.160.0"
+  }
+}
