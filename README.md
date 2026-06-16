@@ -192,14 +192,20 @@ new Walkthrough({
 });
 ```
 
-- The demo ships with three.js's `RobotExpressive` model in
-  [`public/avatar/`](public/avatar) so it works offline after clone.
-- **Swap in your own character** by pointing `url` at any rigged humanoid `.glb`
-  with named animation clips — e.g. a free [Ready Player Me](https://readyplayer.me)
-  avatar plus [Mixamo](https://mixamo.com) animations — to get a realistic human
-  guide instead of the robot.
-- Trade-off: this pulls in three.js (~150 kB gzipped) + the model file, so it's no
-  longer the tiny drop-in widget. Use the SVG mascot when bundle size matters.
+- The demo ships with a **realistic human avatar** (`public/avatar/human.glb`, an
+  Avaturn rig with idle / greet / walk / think clips) and also includes three.js's
+  stylized `RobotExpressive`. Both are bundled in [`public/avatar/`](public/avatar)
+  so the demo works offline after clone.
+- The human is a **placeholder** — swap in your own by pointing `url` at any rigged
+  humanoid `.glb` with named animation clips. Good sources:
+  [Ready Player Me](https://readyplayer.me) or [Avaturn](https://avaturn.me)
+  avatars, plus [Mixamo](https://mixamo.com) animations. Then map the clip names
+  via the `anims` option (see [`src/demo/main.ts`](src/demo/main.ts)).
+- The avatar walks to travel between steps, plays a greeting on the intro, and
+  yaws to face the element it's describing.
+- Trade-off: this pulls in three.js (~150 kB gzipped) + the model file (the human is
+  ~5 MB), so it's no longer the tiny drop-in widget. Use the SVG mascot, or the much
+  smaller robot, when bundle size matters.
 
 ## 📁 Project structure
 
@@ -213,7 +219,7 @@ src/
     types.ts          ← public TypeScript API
     index.ts          ← exports
   demo/               ← the EnSight portal mock that showcases it
-public/avatar/        ← the bundled 3D model (RobotExpressive.glb)
+public/avatar/        ← bundled 3D models (human.glb, RobotExpressive.glb)
 index.html            ← demo entry
 ```
 

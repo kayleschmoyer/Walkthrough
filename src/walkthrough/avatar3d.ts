@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import type { CharacterHandle } from "./character.ts";
 
 /**
@@ -7,9 +8,9 @@ import type { CharacterHandle } from "./character.ts";
  * as the SVG mascot, so the walkthrough controller can drive it unchanged.
  *
  * It renders a rigged glTF character to a small transparent canvas, plays
- * skeletal animations (idle / wave / jump / gesture), and yaws to face whatever
- * element it's describing. Swap `url` for any rigged humanoid glb (e.g. a
- * Ready Player Me avatar) to change the character.
+ * skeletal animations (idle / greet / walk / gesture), and yaws to face the
+ * element it's describing. Point `url` at any rigged humanoid `.glb` (Ready
+ * Player Me, Avaturn, Mixamo…) and map its clip names via `anims`.
  */
 export interface Avatar3DOptions {
   /** URL of a rigged .glb with named animation clips. */
@@ -17,39 +18,52 @@ export interface Avatar3DOptions {
   /** Render width/height of the avatar canvas, in CSS px. */
   width?: number;
   height?: number;
+  /** Camera framing. */
+  camera?: { y?: number; z?: number; lookY?: number; fov?: number };
+  /** Base yaw (radians) if the model faces away from camera by default. */
+  modelYaw?: number;
+  /** Map logical actions to the model's actual animation clip names. */
+  anims?: { idle?: string; greet?: string; walk?: string; gesture?: string };
 }
-
-// RobotExpressive's clip names.
-const LOOPS = new Set(["Idle", "Walking", "Running"]);
 
 export function createAvatar3D(opts: Avatar3DOptions = {}): CharacterHandle {
   const url = opts.url ?? "/avatar/RobotExpressive.glb";
   const W = opts.width ?? 170;
   const H = opts.height ?? 220;
+  const cam = { y: 2.7, z: 10.6, lookY: 2.15, fov: 36, ...opts.camera };
+  const baseYaw = opts.modelYaw ?? 0;
+  const A = { idle: "Idle", greet: "Wave", walk: "Walking", gesture: "ThumbsUp", ...opts.anims };
+  const looping = new Set([A.idle, A.walk]);
 
   const el = document.createElement("div");
   el.className = "wt-character wt-character-3d";
   el.style.width = `${W}px`;
   el.style.height = `${H}px`;
 
-  // ---- three.js scene -------------------------------------------------
+  // ---- renderer + scene ----------------------------------------------
   const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setSize(W, H);
   renderer.setClearAlpha(0);
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.05;
   el.appendChild(renderer.domElement);
 
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(36, W / H, 0.1, 100);
-  camera.position.set(0, 2.7, 10.6);
-  camera.lookAt(0, 2.15, 0);
+  const camera = new THREE.PerspectiveCamera(cam.fov, W / H, 0.1, 100);
+  camera.position.set(0, cam.y, cam.z);
+  camera.lookAt(0, cam.lookY, 0);
 
-  scene.add(new THREE.HemisphereLight(0xffffff, 0x4a5160, 2.6));
-  const key = new THREE.DirectionalLight(0xffffff, 3.0);
-  key.position.set(3, 8, 6);
+  // soft image-based lighting for realistic skin/cloth shading
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x3a3f4a, 1.1));
+  const key = new THREE.DirectionalLight(0xffffff, 2.2);
+  key.position.set(2.5, 6, 5);
   scene.add(key);
-  const rim = new THREE.DirectionalLight(0x88bbff, 1.4);
-  rim.position.set(-4, 3, -5);
+  const rim = new THREE.DirectionalLight(0x9fc6ff, 1.1);
+  rim.position.set(-4, 4, -5);
   scene.add(rim);
 
   // ---- state ----------------------------------------------------------
@@ -57,7 +71,8 @@ export function createAvatar3D(opts: Avatar3DOptions = {}): CharacterHandle {
   let mixer: THREE.AnimationMixer | undefined;
   const actions = new Map<string, THREE.AnimationAction>();
   let active: THREE.AnimationAction | undefined;
-  let targetYaw = 0;
+  let targetYaw = baseYaw;
+  let walkTimer = 0;
   let pending: (() => void) | undefined;
   const clock = new THREE.Clock();
 
@@ -71,14 +86,11 @@ export function createAvatar3D(opts: Avatar3DOptions = {}): CharacterHandle {
 
   const restore = () => {
     mixer?.removeEventListener("finished", restore);
-    fadeTo("Idle", 0.25);
+    fadeTo(A.idle, 0.3);
   };
 
   function emote(name: string) {
-    const a = actions.get(name);
-    if (!a) return;
-    a.setLoop(THREE.LoopOnce, 1);
-    a.clampWhenFinished = true;
+    if (!actions.has(name)) return;
     fadeTo(name, 0.2);
     mixer!.addEventListener("finished", restore);
   }
@@ -86,22 +98,21 @@ export function createAvatar3D(opts: Avatar3DOptions = {}): CharacterHandle {
   // ---- load -----------------------------------------------------------
   new GLTFLoader().load(url, (gltf) => {
     model = gltf.scene;
-    model.traverse((o) => {
-      const m = o as THREE.Mesh;
-      if (m.isMesh) m.castShadow = true;
-    });
+    model.rotation.y = baseYaw;
     scene.add(model);
 
     mixer = new THREE.AnimationMixer(model);
     for (const clip of gltf.animations) {
+      // Strip root translation so locomotion plays "in place" in the canvas.
+      clip.tracks = clip.tracks.filter((t) => !/hips.*\.position$/i.test(t.name));
       const a = mixer.clipAction(clip);
-      if (!LOOPS.has(clip.name)) {
+      if (!looping.has(clip.name)) {
         a.setLoop(THREE.LoopOnce, 1);
         a.clampWhenFinished = true;
       }
       actions.set(clip.name, a);
     }
-    fadeTo("Idle", 0);
+    fadeTo(A.idle, 0);
     pending?.();
     pending = undefined;
   });
@@ -110,45 +121,39 @@ export function createAvatar3D(opts: Avatar3DOptions = {}): CharacterHandle {
   let raf = 0;
   const tick = () => {
     raf = requestAnimationFrame(tick);
-    const dt = clock.getDelta();
-    mixer?.update(dt);
+    mixer?.update(clock.getDelta());
     if (model) model.rotation.y += (targetYaw - model.rotation.y) * 0.12;
     renderer.render(scene, camera);
   };
   tick();
 
   // ---- CharacterHandle API -------------------------------------------
+  const run = (fn: () => void) => (model ? fn() : (pending = fn));
+
   function point(fromX: number, _fromY: number, toX: number, _toY: number) {
-    // Yaw the avatar to turn toward the element it's describing.
-    const dx = toX - fromX;
-    targetYaw = THREE.MathUtils.clamp(dx / 900, -0.6, 0.6);
-    const run = () => emote("ThumbsUp");
-    if (model) run();
-    else pending = run;
+    // Turn toward the element being described.
+    targetYaw = baseYaw + THREE.MathUtils.clamp((toX - fromX) / 900, -0.6, 0.6);
   }
-
   function rest() {
-    targetYaw = 0;
-    const run = () => fadeTo("Idle", 0.3);
-    if (model) run();
-    else pending = run;
+    targetYaw = baseYaw;
+    run(() => fadeTo(A.idle, 0.3));
   }
-
   function wave() {
-    targetYaw = 0;
-    const run = () => emote("Wave");
-    if (model) run();
-    else pending = run;
+    targetYaw = baseYaw;
+    run(() => emote(A.greet));
   }
-
   function hop() {
-    const run = () => emote("Jump");
-    if (model) run();
-    else pending = run;
+    // Travel: walk for the glide window, then settle back to idle.
+    run(() => {
+      fadeTo(A.walk, 0.25);
+      window.clearTimeout(walkTimer);
+      walkTimer = window.setTimeout(() => fadeTo(A.idle, 0.3), 720);
+    });
   }
-
   function dispose() {
     cancelAnimationFrame(raf);
+    window.clearTimeout(walkTimer);
+    pmrem.dispose();
     renderer.dispose();
     renderer.domElement.remove();
   }

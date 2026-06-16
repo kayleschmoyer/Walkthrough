@@ -16,7 +16,15 @@ const tour = new Walkthrough({
   accentColor: "#33a7e0", // EnSight blue
   speech: true,
   storageKey: "ensight-tour",
-  characterFactory: () => createAvatar3D(), // real-time 3D avatar
+  // Real-time 3D human avatar (Avaturn rig). Swap `url` for your own avatar.
+  characterFactory: () =>
+    createAvatar3D({
+      url: "/avatar/human.glb",
+      width: 200,
+      height: 290,
+      camera: { y: 0.95, z: 3.05, lookY: 0.92, fov: 34 },
+      anims: { idle: "IdleV4.2(maya_head)", greet: "greet", walk: "walking", gesture: "think" },
+    }),
   steps: [
     {
       title: "Hi, I'm Pip! 👋",
