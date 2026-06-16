@@ -29,7 +29,6 @@ const tour = new Walkthrough({
         greet: "/avatar/anims/greet.glb",
         walk: "/avatar/anims/walk.glb",
         gesture: "/avatar/anims/gesture.glb",
-        entrance: "/avatar/anims/entrance.glb", // Standing.Up on first appearance
         celebrate: "/avatar/anims/celebrate.glb", // Excited on the final step
       },
     }),

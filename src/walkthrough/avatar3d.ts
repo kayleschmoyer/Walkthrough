@@ -149,7 +149,9 @@ export function createAvatar3D(opts: Avatar3DOptions = {}): CharacterHandle {
   return {
     el,
     point(fromX, _fromY, toX) {
-      targetYaw = baseYaw + THREE.MathUtils.clamp((toX - fromX) / 900, -0.6, 0.6);
+      // Keep her facing the viewer, with only a subtle lean toward the target
+      // (the pointing animation + spotlight convey direction).
+      targetYaw = baseYaw + THREE.MathUtils.clamp((toX - fromX) / 2600, -0.16, 0.16);
     },
     rest() {
       targetYaw = baseYaw;

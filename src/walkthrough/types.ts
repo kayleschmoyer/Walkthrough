@@ -51,6 +51,12 @@ export interface WalkthroughOptions {
   /** Speak each step aloud using the browser's built-in voice. Default: true. */
   speech?: boolean;
 
+  /**
+   * Preferred narration voice (substring of the voice name, e.g. "Samantha",
+   * "Aria"). If omitted, a natural-sounding female English voice is auto-picked.
+   */
+  voice?: string;
+
   /** Start narration muted (user can unmute). Default: false. */
   startMuted?: boolean;
 

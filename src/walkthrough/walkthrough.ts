@@ -34,6 +34,7 @@ export class Walkthrough {
 
   private typeTimer?: number;
   private glideTimer?: number;
+  private voice?: SpeechSynthesisVoice | null;
   private fullText = "";
   private active = false;
   private shown = false;
@@ -170,7 +171,18 @@ export class Walkthrough {
     window.addEventListener("scroll", this.relayout, true);
     window.addEventListener("resize", this.relayout);
     if (this.opts.keyboard) window.addEventListener("keydown", this.onKey);
+
+    // Voices load asynchronously in some browsers — prime them and re-pick
+    // once they arrive so even the first step uses the chosen voice.
+    if ("speechSynthesis" in window) {
+      window.speechSynthesis.getVoices();
+      window.speechSynthesis.addEventListener("voiceschanged", this.onVoices);
+    }
   }
+
+  private onVoices = (): void => {
+    this.voice = undefined; // force re-pick with the now-loaded voice list
+  };
 
   private async show(step: WalkthroughStep): Promise<void> {
     // Open the containing tab/section first, if any.
@@ -374,9 +386,44 @@ export class Walkthrough {
     if (!this.opts.speech || this.muted || !("speechSynthesis" in window)) return;
     window.speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
-    u.rate = 1.02;
-    u.pitch = 1.15;
+    const v = this.pickVoice();
+    if (v) u.voice = v;
+    u.rate = 1.0;
+    u.pitch = 1.05;
     window.speechSynthesis.speak(u);
+  }
+
+  /** Choose a natural-sounding female English voice, if one is available. */
+  private pickVoice(): SpeechSynthesisVoice | undefined {
+    if (this.opts.voice) {
+      const named = window.speechSynthesis
+        .getVoices()
+        .find((v) => v.name.toLowerCase().includes(this.opts.voice!.toLowerCase()));
+      if (named) return named;
+    }
+    if (this.voice !== undefined) return this.voice ?? undefined;
+    const voices = window.speechSynthesis.getVoices();
+    if (!voices.length) return undefined; // not loaded yet — retry next step
+
+    const en = voices.filter((v) => /^en[-_]?/i.test(v.lang));
+    const pool = en.length ? en : voices;
+    // Preferred natural female voices across macOS / Windows / Chrome, best first.
+    const prefs = [
+      "samantha", "ava", "aria", "jenny", "michelle", "emma", "sonia",
+      "libby", "google us english", "zira", "susan", "female",
+    ];
+    const score = (v: SpeechSynthesisVoice): number => {
+      const n = v.name.toLowerCase();
+      let s = 0;
+      const i = prefs.findIndex((p) => n.includes(p));
+      if (i >= 0) s += (prefs.length - i) * 10;
+      if (/natural|online|premium|enhanced/.test(n)) s += 30;
+      if (/\bmale\b/.test(n) && !n.includes("female")) s -= 100;
+      return s;
+    };
+    const best = [...pool].sort((a, b) => score(b) - score(a))[0];
+    this.voice = best ?? null;
+    return best;
   }
 
   private toggleSound = (): void => {
@@ -405,6 +452,7 @@ export class Walkthrough {
     window.removeEventListener("scroll", this.relayout, true);
     window.removeEventListener("resize", this.relayout);
     window.removeEventListener("keydown", this.onKey);
+    window.speechSynthesis?.removeEventListener("voiceschanged", this.onVoices);
     this.character?.dispose?.();
     this.character = undefined;
     this.root?.remove();

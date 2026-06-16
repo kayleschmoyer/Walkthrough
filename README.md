@@ -199,8 +199,7 @@ new Walkthrough({
         greet: "/avatar/anims/greet.glb",
         walk: "/avatar/anims/walk.glb",
         gesture: "/avatar/anims/gesture.glb",
-        entrance: "/avatar/anims/entrance.glb", // optional: first appearance
-        celebrate: "/avatar/anims/celebrate.glb", // optional: final step
+        celebrate: "/avatar/anims/celebrate.glb", // optional: final-step celebration
       },
     }),
   steps: [ /* ... */ ],
@@ -213,10 +212,12 @@ new Walkthrough({
   web (1 M verts / 80 MB → ~7 MB). Her Mixamo clips (idle / waving / walking /
   pointing) live in [`public/avatar/anims/`](public/avatar/anims) as tiny
   animation-only `.glb`s. three.js's lighter `RobotExpressive` robot is also bundled.
-- She **stands up** to make an entrance, **walks** over and **points** at each
-  element as she explains it, **celebrates** on the final step, and yaws to face
-  whatever she's describing. (`entrance` and `celebrate` are optional roles — the
-  controller falls back to a wave when they're absent.)
+- She **greets** you on the intro, **walks** over and **points** at each element as
+  she explains it, and **celebrates** on the final step — while staying turned
+  toward the viewer. (`entrance` and `celebrate` are optional roles; the controller
+  falls back to a wave when they're absent.)
+- Narration auto-picks a natural female English voice (override with the `voice`
+  option, e.g. `voice: "Samantha"`).
 - **Make your own** the same way: generate a character (3D AI Studio, Ready Player
   Me, Avaturn…), rig + grab animations on Mixamo, export FBX, and I convert them to
   optimized `.glb`. Map clips to roles (`idle`/`greet`/`walk`/`gesture`) via
